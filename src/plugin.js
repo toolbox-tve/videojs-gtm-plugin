@@ -8,6 +8,29 @@ const defaults = {};
 const registerPlugin = videojs.registerPlugin || videojs.plugin;
 // const dom = videojs.dom || videojs;
 
+const createGtmDataLayer = (options) => {
+  const dataLayerVarName = 'dataLayer' + Math.floor(Math.random() * 1000);
+
+  if (options.gtmDataLayer) {
+    return () => options.gtmDataLayer;
+  }
+
+  /* global document */
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  const newScriptTag = document.createElement('script');
+  const key = options.gtmKey;
+
+  newScriptTag.async = true;
+  newScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + key + '&l=' + dataLayerVarName;
+  firstScriptTag.parentNode.insertBefore(newScriptTag, firstScriptTag);
+
+  const noDataLayer = {
+    push: () => {}
+  };
+
+  /* global window */
+  return () => window[dataLayerVarName] || noDataLayer;
+};
 /**
  * Function to invoke when the player is ready.
  *
@@ -23,25 +46,25 @@ const registerPlugin = videojs.registerPlugin || videojs.plugin;
  *           A plain object containing options for the plugin.
  */
 const onPlayerReady = (player, options) => {
-  const gtmDataLayer = options.gtmDataLayer;
+  const gtmDataLayer = createGtmDataLayer(options);
   const contentLabel = options.contentLabel;
   const additionalData = options.additionalData;
   let pendingPercentiles = (options.percentiles || []).slice(0);
   let lastTime = 0;
 
   function onPlayerPlay(e) {
-    gtmDataLayer.push({
+    gtmDataLayer().push({
       event: 'play',
       label: contentLabel,
-      additionalData: additionalData
+      additionalData
     });
   }
 
   function onPlayerPause(e) {
-    gtmDataLayer.push({
+    gtmDataLayer().push({
       event: 'pause',
       label: contentLabel,
-      additionalData: additionalData
+      additionalData
     });
   }
 
@@ -50,7 +73,7 @@ const onPlayerReady = (player, options) => {
       const fraction = player.currentTime() / player.duration();
 
       // reset persentiles
-      pendingPercentiles = percentiles.filter(p => p >= fraction);
+      pendingPercentiles = options.percentiles.filter(p => p >= fraction);
     }
 
     if (pendingPercentiles.length) {
@@ -58,10 +81,10 @@ const onPlayerReady = (player, options) => {
       const percentil = pendingPercentiles[0];
 
       if (fraction >= percentil) {
-        gtmDataLayer.push({
+        gtmDataLayer().push({
           event: 'consumo-porcentual',
           label: (percentil * 100) + '%',
-          additionalData: additionalData
+          additionalData
         });
 
         pendingPercentiles.shift();
