@@ -13,8 +13,8 @@
   
 </head>
 <body>
-  <video id="videojs-tbx-gtm-player" class="video-js vjs-default-skin" controls>
-    <source src="//vjs.zencdn.net/v/oceans.mp4" type='video/mp4'>
+  <video width="800" id="videojs-tbx-gtm-player" class="video-js vjs-default-skin" controls>
+    <source src="/static/doometernal.mp4" type='video/mp4'>
     <source src="//vjs.zencdn.net/v/oceans.webm" type='video/webm'>
   </video>
   <ul>
@@ -26,7 +26,14 @@
   <script>
     (function(window, videojs) {
       var examplePlayer = window.examplePlayer = videojs('videojs-tbx-gtm-player');
-      var tbxGtm = window.tbxGtm = examplePlayer.tbxGtm();
+      var tbxGtm = window.tbxGtm = examplePlayer.tbxGtm({
+        gtmDataLayer: window.dataLayer,
+        additionalData: {
+          name: 'Doom Eternal - Official E3 Story Trailer'
+        },
+        contentLabel: 'Doom Eternal - Official E3 Story Trailer',
+        percentiles: [0, 0.2, 0.4, 0.6, 0.8, 0.95]
+      });
     }(window, window.videojs));
   </script>
 </body>

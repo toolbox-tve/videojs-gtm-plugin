@@ -8,8 +8,6 @@ const defaults = {};
 const registerPlugin = videojs.registerPlugin || videojs.plugin;
 // const dom = videojs.dom || videojs;
 
-const percentiles = [0, 0.2, 0.4, 0.6, 0.8, 0.95];
-
 /**
  * Function to invoke when the player is ready.
  *
@@ -25,28 +23,25 @@ const percentiles = [0, 0.2, 0.4, 0.6, 0.8, 0.95];
  *           A plain object containing options for the plugin.
  */
 const onPlayerReady = (player, options) => {
-  // TODO: la instancia de gtm tiene que venir de options
-  /* global window */
-  const gtm = window.dataLayer;
-  let pendingPercentiles = percentiles.slice(0);
+  const gtmDataLayer = options.gtmDataLayer;
+  const contentLabel = options.contentLabel;
+  const additionalData = options.additionalData;
+  let pendingPercentiles = (options.percentiles || []).slice(0);
   let lastTime = 0;
 
-  // TODO: la instancia de content tiene que venir de options
-  const content = {
-    title: 'The Matrix'
-  };
-
   function onPlayerPlay(e) {
-    gtm.push({
+    gtmDataLayer.push({
       event: 'play',
-      label: content.title
+      label: contentLabel,
+      additionalData: additionalData
     });
   }
 
   function onPlayerPause(e) {
-    gtm.push({
+    gtmDataLayer.push({
       event: 'pause',
-      label: content.title
+      label: contentLabel,
+      additionalData: additionalData
     });
   }
 
@@ -63,9 +58,10 @@ const onPlayerReady = (player, options) => {
       const percentil = pendingPercentiles[0];
 
       if (fraction >= percentil) {
-        gtm.push({
+        gtmDataLayer.push({
           event: 'consumo-porcentual',
-          label: (percentil * 100) + '%'
+          label: (percentil * 100) + '%',
+          additionalData: additionalData
         });
 
         pendingPercentiles.shift();
