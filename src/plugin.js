@@ -8,6 +8,8 @@ const defaults = {};
 const registerPlugin = videojs.registerPlugin || videojs.plugin;
 // const dom = videojs.dom || videojs;
 
+const percentiles = [0, 0.2, 0.4, 0.6, 0.8, 0.95];
+
 /**
  * Function to invoke when the player is ready.
  *
@@ -23,6 +25,59 @@ const registerPlugin = videojs.registerPlugin || videojs.plugin;
  *           A plain object containing options for the plugin.
  */
 const onPlayerReady = (player, options) => {
+  // TODO: la instancia de gtm tiene que venir de options
+  /* global window */
+  const gtm = window.dataLayer;
+  let pendingPercentiles = percentiles.slice(0);
+  let lastTime = 0;
+
+  // TODO: la instancia de content tiene que venir de options
+  const content = {
+    title: 'The Matrix'
+  };
+
+  function onPlayerPlay(e) {
+    gtm.push({
+      event: 'play',
+      label: content.title
+    });
+  }
+
+  function onPlayerPause(e) {
+    gtm.push({
+      event: 'pause',
+      label: content.title
+    });
+  }
+
+  function onTimeUpdate(e) {
+    if (lastTime > player.currentTime()) {
+      const fraction = player.currentTime() / player.duration();
+
+      // reset persentiles
+      pendingPercentiles = percentiles.filter(p => p >= fraction);
+    }
+
+    if (pendingPercentiles.length) {
+      const fraction = player.currentTime() / player.duration();
+      const percentil = pendingPercentiles[0];
+
+      if (fraction >= percentil) {
+        gtm.push({
+          event: 'consumo-porcentual',
+          label: (percentil * 100) + '%'
+        });
+
+        pendingPercentiles.shift();
+      }
+    }
+
+    lastTime = player.currentTime();
+  }
+
+  player.on('play', onPlayerPlay);
+  player.on('pause', onPlayerPause);
+  player.on('timeupdate', onTimeUpdate);
   player.addClass('vjs-tbx-gtm');
 };
 
