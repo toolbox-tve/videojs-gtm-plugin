@@ -90,6 +90,10 @@ const onPlayerReady = (player, options) => {
     });
   }
 
+  function onPlayerEnded(e) {
+    computePlayingTime();
+  }
+
   let firstTimeUpdate = null;
   let initialized = false;
 
@@ -135,6 +139,7 @@ const onPlayerReady = (player, options) => {
   }
 
   player.on('play', onPlayerPlay);
+  player.on('ended', onPlayerEnded);
   player.on('pause', onPlayerPause);
   player.on('timeupdate', onTimeUpdate);
   player.addClass('vjs-tbx-gtm');
