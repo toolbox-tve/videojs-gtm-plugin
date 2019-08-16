@@ -68,7 +68,26 @@ const onPlayerReady = (player, options) => {
     });
   }
 
+  let firstTimeUpdate = null;
+  let initialized = false;
   function onTimeUpdate(e) {
+    if (!initialized) {
+      if (firstTimeUpdate === null) {
+        firstTimeUpdate = Math.floor(player.currentTime());
+      } else {
+        if (firstTimeUpdate !== Math.floor(player.currentTime)) {
+          // reportar Inicio
+          gtmDataLayer().push({
+            event: 'inicio',
+            label: contentLabel,
+            additionalData
+          });
+
+          initialized = true;
+        }
+      }
+    }
+
     if (lastTime > player.currentTime()) {
       const fraction = player.currentTime() / player.duration();
 
