@@ -57,6 +57,7 @@ const onPlayerReady = (player, options) => {
   function computePlayingTime() {
     if (lastStartTime !== null) {
       const delta = (new Date().getTime() - lastStartTime);
+
       viewedMilliseconds = viewedMilliseconds + delta;
 
       gtmDataLayer().push({
@@ -91,21 +92,20 @@ const onPlayerReady = (player, options) => {
 
   let firstTimeUpdate = null;
   let initialized = false;
+
   function onTimeUpdate(e) {
     if (!initialized) {
       if (firstTimeUpdate === null) {
         firstTimeUpdate = Math.floor(player.currentTime());
-      } else {
-        if (firstTimeUpdate !== Math.floor(player.currentTime)) {
-          // reportar Inicio
-          gtmDataLayer().push({
-            event: 'inicio',
-            label: contentLabel,
-            additionalData
-          });
+      } else if (firstTimeUpdate !== Math.floor(player.currentTime)) {
+        // reportar Inicio
+        gtmDataLayer().push({
+          event: 'inicio',
+          label: contentLabel,
+          additionalData
+        });
 
-          initialized = true;
-        }
+        initialized = true;
       }
     }
 
