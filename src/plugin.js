@@ -51,8 +51,28 @@ const onPlayerReady = (player, options) => {
   const additionalData = options.additionalData;
   let pendingPercentiles = (options.percentiles || []).slice(0);
   let lastTime = 0;
+  let viewedMilliseconds = 0;
+  let lastStartTime = null;
+
+  function computePlayingTime() {
+    if (lastStartTime !== null) {
+      const delta = (new Date().getTime() - lastStartTime);
+      viewedMilliseconds = viewedMilliseconds + delta;
+
+      gtmDataLayer().push({
+        event: 'minutos-vistos',
+        label: Math.floor(viewedMilliseconds / 60000) + '',
+        additionalData
+      });
+    }
+
+    lastStartTime = null;
+  }
 
   function onPlayerPlay(e) {
+    computePlayingTime();
+    lastStartTime = new Date().getTime();
+
     gtmDataLayer().push({
       event: 'play',
       label: contentLabel,
@@ -61,6 +81,7 @@ const onPlayerReady = (player, options) => {
   }
 
   function onPlayerPause(e) {
+    computePlayingTime();
     gtmDataLayer().push({
       event: 'pause',
       label: contentLabel,
@@ -95,7 +116,7 @@ const onPlayerReady = (player, options) => {
       pendingPercentiles = options.percentiles.filter(p => p >= fraction);
     }
 
-    if (pendingPercentiles.length) {
+    if (pendingPercentiles.length && initialized) {
       const fraction = player.currentTime() / player.duration();
       const percentil = pendingPercentiles[0];
 
