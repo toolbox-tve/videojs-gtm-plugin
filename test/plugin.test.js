@@ -15,7 +15,7 @@ QUnit.test('the environment is sane', function(assert) {
   assert.strictEqual(typeof plugin, 'function', 'plugin is a function');
 });
 
-QUnit.module('videojs-tbx-gtm', {
+QUnit.module('videojs-gtm-plugin', {
 
   beforeEach() {
 
@@ -43,7 +43,7 @@ QUnit.test('registers itself with video.js', function(assert) {
   assert.strictEqual(
     typeof Player.prototype.tbxGtm,
     'function',
-    'videojs-tbx-gtm plugin was registered'
+    'videojs-gtm-plugin plugin was registered'
   );
 
   this.player.tbxGtm();

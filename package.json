@@ -1,9 +1,9 @@
 {
-  "name": "videojs-tbx-gtm",
+  "name": "videojs-gtm-plugin",
   "version": "0.0.0",
   "description": "Reporting of player events to Google Tag Manager API",
-  "main": "dist/videojs-tbx-gtm.cjs.js",
-  "module": "dist/videojs-tbx-gtm.es.js",
+  "main": "dist/videojs-gtm-plugin.cjs.js",
+  "module": "dist/videojs-gtm-plugin.es.js",
   "generator-videojs-plugin": {
     "version": "7.6.3"
   },
