@@ -15,6 +15,10 @@ const createGtmDataLayer = (options) => {
     return () => options.gtmDataLayer;
   }
 
+  if (!options.gtmKey) {
+    return noDataLayer;
+  }
+
   /* global document */
   const firstScriptTag = document.getElementsByTagName('script')[0];
   const newScriptTag = document.createElement('script');
