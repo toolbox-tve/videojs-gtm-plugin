@@ -22,7 +22,7 @@ This is the simplest case. Get the script in whatever way you prefer and include
 <script>
   var player = videojs('my-video');
 
-  player.tbxGtm();
+  player.gtm();
 </script>
 ```
 
@@ -40,7 +40,7 @@ require('videojs-gtm-plugin');
 
 var player = videojs('my-video');
 
-player.tbxGtm();
+player.gtm();
 ```
 
 ### RequireJS/AMD
@@ -51,7 +51,7 @@ When using with RequireJS (or another AMD library), get the script in whatever w
 require(['video.js', 'videojs-gtm-plugin'], function(videojs) {
   var player = videojs('my-video');
 
-  player.tbxGtm();
+  player.gtm();
 });
 ```
 

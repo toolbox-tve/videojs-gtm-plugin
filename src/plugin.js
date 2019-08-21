@@ -153,20 +153,20 @@ const onPlayerReady = (player, options) => {
  * depending on how the plugin is invoked. This may or may not be important
  * to you; if not, remove the wait for "ready"!
  *
- * @function tbxGtm
+ * @function gtm
  * @param    {Object} [options={}]
  *           An object of options left to the plugin author to define.
  */
-const tbxGtm = function(options) {
+const gtm = function(options) {
   this.ready(() => {
     onPlayerReady(this, videojs.mergeOptions(defaults, options));
   });
 };
 
 // Register the plugin with video.js.
-registerPlugin('tbxGtm', tbxGtm);
+registerPlugin('gtm', gtm);
 
 // Include the version number.
-tbxGtm.VERSION = VERSION;
+gtm.VERSION = VERSION;
 
-export default tbxGtm;
+export default gtm;

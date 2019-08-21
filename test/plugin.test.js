@@ -41,12 +41,12 @@ QUnit.test('registers itself with video.js', function(assert) {
   assert.expect(2);
 
   assert.strictEqual(
-    typeof Player.prototype.tbxGtm,
+    typeof Player.prototype.gtm,
     'function',
     'videojs-gtm-plugin plugin was registered'
   );
 
-  this.player.tbxGtm();
+  this.player.gtm();
 
   // Tick the clock forward enough to trigger the player to be "ready".
   this.clock.tick(1);
