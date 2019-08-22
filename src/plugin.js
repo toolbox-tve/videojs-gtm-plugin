@@ -198,7 +198,6 @@ class Gtm extends Plugin {
    *         Function returning instance of gtmDataLayer
    */
   createGtmDataLayer(options) {
-    const dataLayerVarName = 'dataLayer' + Math.floor(Math.random() * 1000);
     const noDataLayer = {
       push: () => {}
     };
@@ -215,17 +214,20 @@ class Gtm extends Plugin {
       return noDataLayer;
     }
 
-    /* global document */
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    const newScriptTag = document.createElement('script');
-    const key = options.gtmKey;
+    if (!window.dataLayer) {
 
-    newScriptTag.async = true;
-    newScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + key + '&l=' + dataLayerVarName;
-    firstScriptTag.parentNode.insertBefore(newScriptTag, firstScriptTag);
+      /* global document */
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      const newScriptTag = document.createElement('script');
+      const key = options.gtmKey;
+
+      newScriptTag.async = true;
+      newScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + key + '&l=dataLayer';
+      firstScriptTag.parentNode.insertBefore(newScriptTag, firstScriptTag);
+    }
 
     /* global window */
-    return () => window[dataLayerVarName] || noDataLayer;
+    return () => window.dataLayer || noDataLayer;
   }
 }
 
