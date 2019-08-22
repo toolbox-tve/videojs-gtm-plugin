@@ -65,8 +65,10 @@ const onPlayerReady = (player, options) => {
       viewedMilliseconds = viewedMilliseconds + delta;
 
       gtmDataLayer().push({
-        event: 'minutos-vistos',
-        label: Math.floor(viewedMilliseconds / 60000) + '',
+        event: 'videoDetail',
+        eventCategory: 'video',
+        eventAction: 'Totalidad minutos vistos',
+        eventLabel: contentLabel,
         additionalData
       });
     }
@@ -79,8 +81,10 @@ const onPlayerReady = (player, options) => {
     lastStartTime = new Date().getTime();
 
     gtmDataLayer().push({
-      event: 'play',
-      label: contentLabel,
+      event: 'videoDetail',
+      eventCategory: 'video',
+      eventAction: 'play',
+      eventLabel: contentLabel,
       additionalData
     });
   }
@@ -88,8 +92,10 @@ const onPlayerReady = (player, options) => {
   function onPlayerPause(e) {
     computePlayingTime();
     gtmDataLayer().push({
-      event: 'pause',
-      label: contentLabel,
+      event: 'videoDetail',
+      eventCategory: 'video',
+      eventAction: 'pause',
+      eventLabel: contentLabel,
       additionalData
     });
   }
@@ -108,8 +114,10 @@ const onPlayerReady = (player, options) => {
       } else if (firstTimeUpdate !== Math.floor(player.currentTime)) {
         // reportar Inicio
         gtmDataLayer().push({
-          event: 'inicio',
-          label: contentLabel,
+          event: 'videoDetail',
+          eventCategory: 'video',
+          eventAction: 'inicio',
+          eventLabel: contentLabel,
           additionalData
         });
 
@@ -130,8 +138,10 @@ const onPlayerReady = (player, options) => {
 
       if (fraction >= percentil) {
         gtmDataLayer().push({
-          event: 'consumo-porcentual',
-          label: (percentil * 100) + '%',
+          event: 'videoDetail',
+          eventCategory: 'video',
+          eventAction: 'consumo-porcentual',
+          eventLabel: (percentil * 100) + '%',
           additionalData
         });
 
