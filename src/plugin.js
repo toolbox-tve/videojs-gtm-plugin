@@ -52,18 +52,35 @@ class Gtm extends Plugin {
     }
 
     this.lastTime = 0;
-    this.viewedMilliseconds = 0;
-    this.lastStartTime = null;
     this.firstTimeUpdate = null;
 
     this.options = videojs.mergeOptions(defaults, options);
     this.player.ready(() => {
       this.player.addClass('vjs-concurrence-limiter');
 
-      this.player.on('play', this.onPlayerPlay.bind(this));
-      this.player.on('ended', this.onPlayerEnded.bind(this));
-      this.player.on('pause', this.onPlayerPause.bind(this));
-      this.player.on('timeupdate', this.onTimeUpdate.bind(this));
+      const onPlayerPlay = this.onPlayerPlay.bind(this);
+      const onPlayerDispose = this.onPlayerDispose.bind(this);
+      const onPlayerPause = this.onPlayerPause.bind(this);
+      const onTimeUpdate = this.onTimeUpdate.bind(this);
+      const onWindowBeforeUpload = this.onWindowBeforeUpload.bind(this);
+
+      this.player.on('play', onPlayerPlay);
+      this.player.on('dispose', onPlayerDispose);
+      this.player.on('pause', onPlayerPause);
+      this.player.on('timeupdate', onTimeUpdate);
+
+      window.addEventListener('beforeunload', onWindowBeforeUpload);
+
+      this.onDispose = () => {
+        // remove al event handlers
+        this.player.off('play', onPlayerPlay);
+        this.player.off('dispose', onPlayerDispose);
+        this.player.off('pause', onPlayerPause);
+        this.player.off('timeupdate', onTimeUpdate);
+
+        window.removeEventListener('beforeunload', onWindowBeforeUpload);
+      };
+
       player.addClass('vjs-tbx-gtm');
     });
   }
@@ -72,44 +89,38 @@ class Gtm extends Plugin {
    * Deregisters all event handlers (method called from video.js).
    */
   dispose() {
-    // remove al event hanlders
-    this.player.off('play', this.onPlayerPlay.bind(this));
-    this.player.off('ended', this.onPlayerEnded.bind(this));
-    this.player.off('pause', this.onPlayerPause.bind(this));
-    this.player.off('timeupdate', this.onTimeUpdate.bind(this));
-
+    if (this.onDispose) {
+      this.onDispose();
+    }
     // Trigger the event needed on dispose
     super.dispose();
+  }
+
+  /**
+   * send viewed time event
+   */
+  sendViewedTime() {
+    this.computePlayingTime();
+    this.gtmDataLayer().push({
+      event: 'videoDetail',
+      eventCategory: 'video',
+      eventAction: parseFloat(this.viewedMinutes).toFixed(2),
+      eventLabel: this.contentLabel,
+      additionalData: this.additionalData
+    });
   }
 
   /**
    * Computes playing time from recorded time states
    */
   computePlayingTime() {
-    if (this.lastStartTime !== null) {
-      const delta = (new Date().getTime() - this.lastStartTime);
-
-      this.viewedMilliseconds = this.viewedMilliseconds + delta;
-
-      this.gtmDataLayer().push({
-        event: 'videoDetail',
-        eventCategory: 'video',
-        eventAction: 'Totalidad minutos vistos',
-        eventLabel: this.contentLabel,
-        additionalData: this.additionalData
-      });
-    }
-
-    this.lastStartTime = null;
+    this.viewedMinutes = this.player.currentTime() / 60;
   }
 
   /**
    * Event handler for 'play' video.js event
    */
   onPlayerPlay() {
-    this.computePlayingTime();
-    this.lastStartTime = new Date().getTime();
-
     this.gtmDataLayer().push({
       event: 'videoDetail',
       eventCategory: 'video',
@@ -123,7 +134,6 @@ class Gtm extends Plugin {
    * Event handler for 'pause' video.js event
    */
   onPlayerPause() {
-    this.computePlayingTime();
     this.gtmDataLayer().push({
       event: 'videoDetail',
       eventCategory: 'video',
@@ -136,8 +146,8 @@ class Gtm extends Plugin {
   /**
    * Event handler for 'ended' video.js event
    */
-  onPlayerEnded() {
-    this.computePlayingTime();
+  onPlayerDispose() {
+    this.sendViewedTime();
   }
 
   /**
@@ -186,6 +196,14 @@ class Gtm extends Plugin {
     }
 
     this.lastTime = this.player.currentTime();
+  }
+
+  /**
+   * Event handler for 'beforunload' window event
+   */
+  onWindowBeforeUpload(event) {
+    event.preventDefault();
+    this.sendViewedTime();
   }
 
   /**

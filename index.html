@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>videojs-gtm-plugin Demo</title>
   <link href="node_modules/video.js/dist/video-js.css" rel="stylesheet">
-  
+  <script src="https://www.googletagmanager.com/gtm.js?id=GTM-58HJLLD&l=dataLayer"></script>
 </head>
 <body>
   <video width="800" id="videojs-gtm-plugin-player" class="video-js vjs-default-skin" controls>
@@ -23,7 +23,7 @@
       debugger;
 
       var gtm = window.gtm = examplePlayer.gtm({
-        gtmKey: 'GTM-58HJLLD',
+        gtmDataLayer: window.dataLayer,
         additionalData: {
           name: 'Doom Eternal - Official E3 Story Trailer'
         },
