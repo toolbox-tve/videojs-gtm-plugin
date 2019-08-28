@@ -220,28 +220,22 @@ class Gtm extends Plugin {
       push: () => {}
     };
 
-    if (!options) {
-      return noDataLayer;
-    }
+    if (options) {
+      if (options.gtmDataLayer) {
+        return () => options.gtmDataLayer;
+      }
 
-    if (options.gtmDataLayer) {
-      return () => options.gtmDataLayer;
-    }
+      if (!window.dataLayer && options.gtmKey) {
 
-    if (!options.gtmKey) {
-      return noDataLayer;
-    }
+        /* global document */
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        const newScriptTag = document.createElement('script');
+        const key = options.gtmKey;
 
-    if (!window.dataLayer) {
-
-      /* global document */
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      const newScriptTag = document.createElement('script');
-      const key = options.gtmKey;
-
-      newScriptTag.async = true;
-      newScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + key + '&l=dataLayer';
-      firstScriptTag.parentNode.insertBefore(newScriptTag, firstScriptTag);
+        newScriptTag.async = true;
+        newScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + key + '&l=dataLayer';
+        firstScriptTag.parentNode.insertBefore(newScriptTag, firstScriptTag);
+      }
     }
 
     /* global window */
