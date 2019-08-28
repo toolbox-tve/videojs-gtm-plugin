@@ -100,7 +100,6 @@ class Gtm extends Plugin {
    * send viewed time event
    */
   sendViewedTime() {
-    this.computePlayingTime();
     this.gtmDataLayer().push({
       event: 'videoDetail',
       eventCategory: 'video',
@@ -157,7 +156,7 @@ class Gtm extends Plugin {
     if (!this.initialized) {
       if (this.firstTimeUpdate === null) {
         this.firstTimeUpdate = Math.floor(this.player.currentTime());
-      } else if (this.firstTimeUpdate !== Math.floor(this.player.currentTime)) {
+      } else if (this.firstTimeUpdate !== Math.floor(this.player.currentTime())) {
         // reportar Inicio
         this.gtmDataLayer().push({
           event: 'videoDetail',
@@ -196,6 +195,8 @@ class Gtm extends Plugin {
     }
 
     this.lastTime = this.player.currentTime();
+
+    this.computePlayingTime();
   }
 
   /**
