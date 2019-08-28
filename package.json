@@ -1,6 +1,6 @@
 {
   "name": "videojs-gtm-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Reporting of player events to Google Tag Manager API",
   "main": "dist/videojs-gtm-plugin.cjs.js",
   "module": "dist/videojs-gtm-plugin.es.js",
