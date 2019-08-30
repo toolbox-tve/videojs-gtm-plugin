@@ -100,13 +100,6 @@ class Gtm extends Plugin {
    * send viewed time event
    */
   sendViewedTime() {
-    this.gtmDataLayer().push({
-      event: 'videoDetail',
-      eventCategory: 'video',
-      eventAction: parseFloat(this.viewedMinutes).toFixed(2),
-      eventLabel: this.contentLabel,
-      additionalData: this.additionalData
-    });
   }
 
   /**
