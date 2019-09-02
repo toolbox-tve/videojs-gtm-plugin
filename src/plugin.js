@@ -129,7 +129,7 @@ class Gtm extends Plugin {
     this.gtmDataLayer().push({
       event: 'videoDetail',
       eventCategory: 'video',
-      eventAction: 'pause',
+      eventAction: 'pausa',
       eventLabel: this.contentLabel,
       additionalData: this.additionalData
     });
@@ -154,7 +154,7 @@ class Gtm extends Plugin {
         this.gtmDataLayer().push({
           event: 'videoDetail',
           eventCategory: 'video',
-          eventAction: 'inicio',
+          eventAction: 'Inicio',
           eventLabel: this.contentLabel,
           additionalData: this.additionalData
         });
@@ -179,7 +179,7 @@ class Gtm extends Plugin {
           event: 'videoDetail',
           eventCategory: 'video',
           eventAction: 'consumo-porcentual',
-          eventLabel: (percentil * 100) + '%',
+          eventLabel: percentil == 0 ? 'Inicio' : (percentil * 100) + '%',
           additionalData: this.additionalData
         });
 
