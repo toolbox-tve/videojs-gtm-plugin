@@ -114,7 +114,7 @@ class Gtm extends Plugin {
    */
   onPlayerPlay() {
     this.gtmDataLayer().push({
-      event: 'videoDetail',
+      event: 'trackVideo',
       eventCategory: 'video',
       eventAction: 'play',
       eventLabel: this.contentLabel,
@@ -127,7 +127,7 @@ class Gtm extends Plugin {
    */
   onPlayerPause() {
     this.gtmDataLayer().push({
-      event: 'videoDetail',
+      event: 'trackVideo',
       eventCategory: 'video',
       eventAction: 'pausa',
       eventLabel: this.contentLabel,
@@ -152,7 +152,7 @@ class Gtm extends Plugin {
       } else if (this.firstTimeUpdate !== Math.floor(this.player.currentTime())) {
         // reportar Inicio
         this.gtmDataLayer().push({
-          event: 'videoDetail',
+          event: 'trackVideo',
           eventCategory: 'video',
           eventAction: 'Inicio',
           eventLabel: this.contentLabel,
@@ -176,7 +176,7 @@ class Gtm extends Plugin {
 
       if (fraction >= percentil) {
         this.gtmDataLayer().push({
-          event: 'videoDetail',
+          event: 'trackVideo',
           eventCategory: 'video',
           eventAction: 'consumo-porcentual',
           eventLabel: percentil == 0 ? 'Inicio' : (percentil * 100) + '%',
