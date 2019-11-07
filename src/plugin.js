@@ -1,5 +1,6 @@
 import videojs from 'video.js';
 import {version as VERSION} from '../package.json';
+import NetTime from "./tracking/netTime.js";
 
 const Plugin = videojs.getPlugin('plugin');
 
@@ -54,7 +55,14 @@ class Gtm extends Plugin {
     this.lastTime = 0;
     this.firstTimeUpdate = null;
 
+    // VideoViews Flags
+    this.videoView3 = false;
+    this.videoView30 = false;
+
+    this._netTime = new NetTime(this.player);
+
     this.options = videojs.mergeOptions(defaults, options);
+
     this.player.ready(() => {
       this.player.addClass('vjs-concurrence-limiter');
 
@@ -100,6 +108,13 @@ class Gtm extends Plugin {
    * send viewed time event
    */
   sendViewedTime() {
+    this.gtmDataLayer().push({
+      event: 'trackVideo',
+      eventCategory: 'video',
+      eventAction: 'consumo-efectivo-minutos',
+      eventLabel: this.contentLabel,
+      additionalData: this.additionalData
+    });
   }
 
   /**
@@ -190,6 +205,30 @@ class Gtm extends Plugin {
     this.lastTime = this.player.currentTime();
 
     this.computePlayingTime();
+
+
+    // Videoview 3 seconds
+    if (this._netTime.getTime() >= 3 && !this.videoView3) {
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'consumo-videview',
+        eventLabel: '3-seg',
+        additionalData: this.additionalData
+      });
+
+      this.videoView3 = true;
+    } else if (this._netTime.getTime() >= 30 && !this.videoView30) { // Videoview 30 seconds
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'consumo-videview',
+        eventLabel: '30-seg',
+        additionalData: this.additionalData
+      });
+
+      this.videoView30 = true;
+    }
   }
 
   /**
@@ -216,7 +255,7 @@ class Gtm extends Plugin {
 
     if (options) {
       if (options.gtmDataLayer) {
-        return () => options.gtmDataLayer;
+        return () => this.decorateDataLayer(options.gtmDataLayer);
       }
 
       if (!window.dataLayer && options.gtmKey) {
@@ -233,7 +272,23 @@ class Gtm extends Plugin {
     }
 
     /* global window */
-    return () => window.dataLayer || noDataLayer;
+    return () => this.decorateDataLayer(window.dataLayer || noDataLayer);
+  }
+
+  decorateDataLayer(dataLayer) {
+    return {
+      push: data => {
+        this.updateAdditionalData(data);
+        dataLayer.push(data);
+      }
+    };
+  }
+
+  updateAdditionalData(data) {
+    data.additionalData = {
+      ...data.additionalData,
+      minConsumidos: (this._netTime && this._netTime.getTime()) || 0
+    };
   }
 }
 
