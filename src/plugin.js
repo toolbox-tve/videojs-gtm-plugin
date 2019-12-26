@@ -113,7 +113,7 @@ class Gtm extends Plugin {
       eventCategory: 'video',
       eventAction: 'consumo-efectivo-minutos',
       eventLabel: this.contentLabel,
-      additionalData: this.additionalData
+      additionalData: this._withConsumedPercentage(this.additionalData)
     });
   }
 
@@ -214,7 +214,7 @@ class Gtm extends Plugin {
         eventCategory: 'video',
         eventAction: 'consumo-videview',
         eventLabel: '3-seg',
-        additionalData: this.additionalData
+        additionalData: this._withConsumedPercentage(this.additionalData)
       });
 
       this.videoView3 = true;
@@ -224,7 +224,7 @@ class Gtm extends Plugin {
         eventCategory: 'video',
         eventAction: 'consumo-videview',
         eventLabel: '30-seg',
-        additionalData: this.additionalData
+        additionalData: this._withConsumedPercentage(this.additionalData)
       });
 
       this.videoView30 = true;
@@ -289,6 +289,11 @@ class Gtm extends Plugin {
       ...data.additionalData,
       minConsumidos: (this._netTime && this._netTime.getTime()) || 0
     };
+  }
+
+  _withConsumedPercentage(additionalData) {
+    const porcentajeConsumido = 100 * this.player.currentTime() / this.player.duration();
+    return Object.assign({}, additionalData, {porcentajeConsumido: porcentajeConsumido});
   }
 }
 
