@@ -131,9 +131,9 @@ class Gtm extends Plugin {
     this.gtmDataLayer().push({
       event: 'trackVideo',
       eventCategory: 'video',
-      eventAction: 'play',
-      eventLabel: this.contentLabel,
-      additionalData: this.additionalData
+      eventAction: 'Interaccion',
+      eventLabel: 'play',
+      additionalData: this._withConsumedPercentage(this.additionalData)
     });
   }
 
@@ -144,9 +144,9 @@ class Gtm extends Plugin {
     this.gtmDataLayer().push({
       event: 'trackVideo',
       eventCategory: 'video',
-      eventAction: 'pausa',
-      eventLabel: this.contentLabel,
-      additionalData: this.additionalData
+      eventAction: 'Interaccion',
+      eventLabel: 'pausa',
+      additionalData: this._withConsumedPercentage(this.additionalData)
     });
   }
 
@@ -171,7 +171,7 @@ class Gtm extends Plugin {
           eventCategory: 'video',
           eventAction: 'Inicio',
           eventLabel: this.contentLabel,
-          additionalData: this.additionalData
+          additionalData: this._withConsumedPercentage(this.additionalData)
         });
 
         this.initialized = true;
