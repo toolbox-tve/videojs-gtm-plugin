@@ -14,6 +14,7 @@ const defaults = {
   percentiles: []
 };
 
+const FORWARD_MAX_DELTA_FACTOR = 1.5;
 // Cross-compatibility for Video.js 5 and 6.
 const registerPlugin = videojs.registerPlugin || videojs.plugin;
 // const dom = videojs.dom || videojs;
@@ -52,6 +53,7 @@ class Gtm extends Plugin {
       this.percentiles = [];
     }
 
+    this._omitPausePlay = 0;
     this.lastTime = 0;
     this.firstTimeUpdate = null;
 
@@ -128,13 +130,15 @@ class Gtm extends Plugin {
    * Event handler for 'play' video.js event
    */
   onPlayerPlay() {
-    this.gtmDataLayer().push({
-      event: 'trackVideo',
-      eventCategory: 'video',
-      eventAction: 'Interaccion',
-      eventLabel: 'play',
-      additionalData: this._withConsumedPercentage(this.additionalData)
-    });
+    if (this._omitPausePlay < Date.now()) {
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'Interaccion',
+        eventLabel: 'play',
+        additionalData: this._withConsumedPercentage(this.additionalData)
+      });
+    }
   }
 
   /**
@@ -142,7 +146,7 @@ class Gtm extends Plugin {
    */
   onPlayerPause() {
     const porcentajeConsumido = 100 * this.player.currentTime() / this.player.duration();
-    if (porcentajeConsumido > 99,9){
+    if (porcentajeConsumido > 99.9){
       this.gtmDataLayer().push({
         event: 'trackVideo',
         eventCategory: 'video',
@@ -150,15 +154,16 @@ class Gtm extends Plugin {
         eventLabel: this.contentLabel,
         additionalData: this._withConsumedPercentage(this.additionalData)
       });
-    }
-    else {
-      this.gtmDataLayer().push({
-        event: 'trackVideo',
-        eventCategory: 'video',
-        eventAction: 'Interaccion',
-        eventLabel: 'pausa',
-        additionalData: this._withConsumedPercentage(this.additionalData)
-      });
+    } else {
+      if (this._omitPausePlay < Date.now()) {
+        this.gtmDataLayer().push({
+          event: 'trackVideo',
+          eventCategory: 'video',
+          eventAction: 'Interaccion',
+          eventLabel: 'pausa',
+          additionalData: this._withConsumedPercentage(this.additionalData)
+        });
+      }
     }
   }
 
@@ -173,6 +178,44 @@ class Gtm extends Plugin {
    * Event handler for 'timeupdate' video.js event
    */
   onTimeUpdate() {
+    if (this._lastTimeUpdateCalled) {
+      if (this.player.currentTime() < this._lastCurrentTime) {
+        const positionDelta /*s*/ = this._lastCurrentTime - this.player.currentTime();
+
+        this._omitPausePlay = Date.now() + 100;
+        this.gtmDataLayer().push({
+          event: 'trackVideo',
+          eventCategory: 'video',
+          eventAction: 'Interaccion',
+          eventLabel: 'retroceso',
+          additionalData: Object.assign(
+            {},
+            this._withConsumedPercentage(this.additionalData),
+            {minAvance: positionDelta / 60})
+        });
+      } else {
+        const positionDelta /*ms*/ = (this.player.currentTime() - this._lastCurrentTime) * 1000;
+        const timeDelta /*ms*/ = Date.now() - this._lastTimeUpdateCalled;
+
+        if (positionDelta > timeDelta * FORWARD_MAX_DELTA_FACTOR) {
+          this._omitPausePlay = Date.now() + 100;
+          this.gtmDataLayer().push({
+            event: 'trackVideo',
+            eventCategory: 'video',
+            eventAction: 'Interaccion',
+            eventLabel: 'adelanto',
+            additionalData: Object.assign(
+              {},
+              this._withConsumedPercentage(this.additionalData),
+              {minAvance: positionDelta / 60000})
+          });
+        }
+      }
+    }
+
+    this._lastTimeUpdateCalled = Date.now();
+    this._lastCurrentTime = this.player.currentTime();
+
     if (!this.initialized) {
       if (this.firstTimeUpdate === null) {
         this.firstTimeUpdate = Math.floor(this.player.currentTime());
