@@ -141,13 +141,25 @@ class Gtm extends Plugin {
    * Event handler for 'pause' video.js event
    */
   onPlayerPause() {
-    this.gtmDataLayer().push({
-      event: 'trackVideo',
-      eventCategory: 'video',
-      eventAction: 'Interaccion',
-      eventLabel: 'pausa',
-      additionalData: this._withConsumedPercentage(this.additionalData)
-    });
+    const porcentajeConsumido = 100 * this.player.currentTime() / this.player.duration();
+    if (porcentajeConsumido > 99,9){
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'Fin',
+        eventLabel: this.contentLabel,
+        additionalData: this._withConsumedPercentage(this.additionalData)
+      });
+    }
+    else {
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'Interaccion',
+        eventLabel: 'pausa',
+        additionalData: this._withConsumedPercentage(this.additionalData)
+      });
+    }
   }
 
   /**
