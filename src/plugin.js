@@ -221,14 +221,6 @@ class Gtm extends Plugin {
         this.firstTimeUpdate = Math.floor(this.player.currentTime());
       } else if (this.firstTimeUpdate !== Math.floor(this.player.currentTime())) {
         // reportar Inicio
-        this.gtmDataLayer().push({
-          event: 'trackVideo',
-          eventCategory: 'video',
-          eventAction: 'Inicio',
-          eventLabel: this.contentLabel,
-          additionalData: this._withConsumedPercentage(this.additionalData)
-        });
-
         this.initialized = true;
       }
     }
