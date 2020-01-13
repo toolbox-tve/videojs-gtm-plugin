@@ -267,7 +267,7 @@ class Gtm extends Plugin {
       this.gtmDataLayer().push({
         event: 'trackVideo',
         eventCategory: 'video',
-        eventAction: 'consumo-videview',
+        eventAction: 'consumo-videoview',
         eventLabel: '3-seg',
         additionalData: this._withConsumedPercentage(this.additionalData)
       });
@@ -277,7 +277,7 @@ class Gtm extends Plugin {
       this.gtmDataLayer().push({
         event: 'trackVideo',
         eventCategory: 'video',
-        eventAction: 'consumo-videview',
+        eventAction: 'consumo-videoview',
         eventLabel: '30-seg',
         additionalData: this._withConsumedPercentage(this.additionalData)
       });
