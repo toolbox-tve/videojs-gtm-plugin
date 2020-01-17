@@ -14,8 +14,6 @@ class NetTime {
     player.on('loadstart', this.reset);
     player.one('play', this.onPlay);
     player.on('timeupdate', this.onTimeUpdate);
-
-
   }
 
   dispose() {
@@ -38,9 +36,9 @@ class NetTime {
 
   onTimeUpdate() {
     const currentPosition = Math.floor(this.player.currentTime());
-    const timePassed = currentPosition -this.lastPosition;
+    const timePassed = currentPosition - this.lastPosition;
 
-    if(timePassed != 0 && timePassed != 1) {
+    if (timePassed !== 0 && timePassed !== 1) {
       this.time += this.lastPosition - this.startPosition;
       this.lastPosition = this.startPosition = currentPosition;
     } else {

@@ -1,6 +1,6 @@
 import videojs from 'video.js';
 import {version as VERSION} from '../package.json';
-import NetTime from "./tracking/netTime.js";
+import NetTime from './tracking/netTime.js';
 
 const Plugin = videojs.getPlugin('plugin');
 
@@ -146,7 +146,8 @@ class Gtm extends Plugin {
    */
   onPlayerPause() {
     const porcentajeConsumido = 100 * this.player.currentTime() / this.player.duration();
-    if (porcentajeConsumido > 99.9){
+
+    if (porcentajeConsumido > 99.9) {
       this.gtmDataLayer().push({
         event: 'trackVideo',
         eventCategory: 'video',
@@ -154,16 +155,14 @@ class Gtm extends Plugin {
         eventLabel: this.contentLabel,
         additionalData: this._withConsumedPercentage(this.additionalData)
       });
-    } else {
-      if (this._omitPausePlay < Date.now()) {
-        this.gtmDataLayer().push({
-          event: 'trackVideo',
-          eventCategory: 'video',
-          eventAction: 'Interaccion',
-          eventLabel: 'pausa',
-          additionalData: this._withConsumedPercentage(this.additionalData)
-        });
-      }
+    } else if (this._omitPausePlay < Date.now()) {
+      this.gtmDataLayer().push({
+        event: 'trackVideo',
+        eventCategory: 'video',
+        eventAction: 'Interaccion',
+        eventLabel: 'pausa',
+        additionalData: this._withConsumedPercentage(this.additionalData)
+      });
     }
   }
 
@@ -180,7 +179,8 @@ class Gtm extends Plugin {
   onTimeUpdate() {
     if (this._lastTimeUpdateCalled) {
       if (this.player.currentTime() < this._lastCurrentTime) {
-        const positionDelta /*s*/ = this._lastCurrentTime - this.player.currentTime();
+        // s
+        const positionDelta = this._lastCurrentTime - this.player.currentTime();
 
         this._omitPausePlay = Date.now() + 100;
         this.gtmDataLayer().push({
@@ -191,11 +191,13 @@ class Gtm extends Plugin {
           additionalData: Object.assign(
             {},
             this._withConsumedPercentage(this.additionalData),
-            {minAvance: Math.floor(positionDelta)})
+            {minAvance: Math.floor(positionDelta)}
+          )
         });
       } else {
-        const positionDelta /*ms*/ = (this.player.currentTime() - this._lastCurrentTime) * 1000;
-        const timeDelta /*ms*/ = Date.now() - this._lastTimeUpdateCalled;
+        // ms
+        const positionDelta = (this.player.currentTime() - this._lastCurrentTime) * 1000;
+        const timeDelta = Date.now() - this._lastTimeUpdateCalled;
 
         if (positionDelta > timeDelta * FORWARD_MAX_DELTA_FACTOR) {
           this._omitPausePlay = Date.now() + 100;
@@ -207,7 +209,8 @@ class Gtm extends Plugin {
             additionalData: Object.assign(
               {},
               this._withConsumedPercentage(this.additionalData),
-              {minAvance: Math.floor(positionDelta / 1000)})
+              {minAvance: Math.floor(positionDelta / 1000)}
+            )
           });
         }
       }
@@ -241,7 +244,7 @@ class Gtm extends Plugin {
           event: 'trackVideo',
           eventCategory: 'video',
           eventAction: 'consumo-porcentual',
-          eventLabel: percentil == 0 ? 'Inicio' : (percentil * 100) + '%',
+          eventLabel: percentil === 0 ? 'Inicio' : (percentil * 100) + '%',
           additionalData: this.additionalData
         });
 
@@ -252,7 +255,6 @@ class Gtm extends Plugin {
     this.lastTime = this.player.currentTime();
 
     this.computePlayingTime();
-
 
     // Videoview 3 seconds
     if (this._netTime.getTime() >= 3 && !this.videoView3) {
@@ -265,7 +267,8 @@ class Gtm extends Plugin {
       });
 
       this.videoView3 = true;
-    } else if (this._netTime.getTime() >= 30 && !this.videoView30) { // Videoview 30 seconds
+    } else if (this._netTime.getTime() >= 30 && !this.videoView30) {
+      // Videoview 30 seconds
       this.gtmDataLayer().push({
         event: 'trackVideo',
         eventCategory: 'video',
@@ -332,15 +335,17 @@ class Gtm extends Plugin {
   }
 
   updateAdditionalData(data) {
-    data.additionalData = {
-      ...data.additionalData,
-      minConsumidos: (this._netTime && this._netTime.getTime()) || 0
-    };
+    data.additionalData.minConsumidos = Object.assign(
+      {},
+      data.additionalData,
+      {minConsumidos: this._netTime && this._netTime.getTime() || 0}
+    );
   }
 
   _withConsumedPercentage(additionalData) {
     const porcentajeConsumido = 100 * this.player.currentTime() / this.player.duration();
-    return Object.assign({}, additionalData, {porcentajeConsumido: porcentajeConsumido});
+
+    return Object.assign({}, additionalData, {porcentajeConsumido});
   }
 }
 
