@@ -191,7 +191,7 @@ class Gtm extends Plugin {
           additionalData: Object.assign(
             {},
             this._withConsumedPercentage(this.additionalData),
-            {minAvance: positionDelta / 60})
+            {minAvance: Math.floor(positionDelta)})
         });
       } else {
         const positionDelta /*ms*/ = (this.player.currentTime() - this._lastCurrentTime) * 1000;
@@ -207,7 +207,7 @@ class Gtm extends Plugin {
             additionalData: Object.assign(
               {},
               this._withConsumedPercentage(this.additionalData),
-              {minAvance: positionDelta / 60000})
+              {minAvance: Math.floor(positionDelta / 1000)})
           });
         }
       }
